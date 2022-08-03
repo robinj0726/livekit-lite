@@ -1,9 +1,12 @@
 package service
 
+import "livekit-lite/pkg/config"
+
 type LivekitServer struct {
+	config *config.Config
 }
 
-func NewLivekitServer() (s *LivekitServer, err error) {
+func NewLivekitServer(conf *config.Config) (s *LivekitServer, err error) {
 	s = &LivekitServer{}
 
 	return

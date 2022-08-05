@@ -7,8 +7,11 @@ import (
 	"syscall"
 
 	"livekit-lite/pkg/config"
-	"livekit-lite/pkg/logger"
 	"livekit-lite/pkg/service"
+
+	serverlogger "livekit-lite/pkg/logger"
+
+	"github.com/livekit/protocol/logger"
 )
 
 func main() {
@@ -24,6 +27,18 @@ func getConfig() (*config.Config, error) {
 	conf, err := config.NewConfig(confString)
 	if err != nil {
 		return nil, err
+	}
+
+	serverlogger.InitFromConfig(conf.Logging)
+
+	if conf.Development {
+		if conf.BindAddresses == nil {
+			conf.BindAddresses = []string{
+				"127.0.0.1",
+				"[::1]",
+			}
+		}
+
 	}
 
 	return conf, nil

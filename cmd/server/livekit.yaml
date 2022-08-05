@@ -5,3 +5,4 @@ rtc:
 logging: 
     json: false
     level: info
+development: true

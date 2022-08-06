@@ -31,6 +31,19 @@ func (s *RoomService) CreateRoom(ctx context.Context, req *livekit.CreateRoomReq
 }
 
 func (s *RoomService) ListRooms(ctx context.Context, req *livekit.ListRoomsRequest) (res *livekit.ListRoomsResponse, err error) {
+	var names []livekit.RoomName
+	if len(req.Names) > 0 {
+		names = livekit.StringsAsRoomNames(req.Names)
+	}
+	rooms, err := s.roomStore.ListRooms(ctx, names)
+	if err != nil {
+		// TODO: translate error codes to twirp
+		return
+	}
+
+	res = &livekit.ListRoomsResponse{
+		Rooms: rooms,
+	}
 	return
 }
 

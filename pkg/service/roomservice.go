@@ -9,11 +9,13 @@ import (
 
 type RoomService struct {
 	roomAllocator RoomAllocator
+	roomStore     ServiceStore
 }
 
-func NewRoomService(ra RoomAllocator) (svc *RoomService, err error) {
+func NewRoomService(ra RoomAllocator, rs ServiceStore) (svc *RoomService, err error) {
 	svc = &RoomService{
 		roomAllocator: ra,
+		roomStore:     rs,
 	}
 
 	return

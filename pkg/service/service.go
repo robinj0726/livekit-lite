@@ -1,15 +1,18 @@
 package service
 
-import "livekit-lite/pkg/config"
+import (
+	"livekit-lite/pkg/config"
+)
 
 func InitializeServer(conf *config.Config) (*LivekitServer, error) {
+	objectStore := createStore()
 
-	roomAllocator, err := NewRoomAllocator(conf)
+	roomAllocator, err := NewRoomAllocator(conf, objectStore)
 	if err != nil {
 		return nil, err
 	}
 
-	roomService, err := NewRoomService(roomAllocator)
+	roomService, err := NewRoomService(roomAllocator, objectStore)
 	if err != nil {
 		return nil, err
 	}
@@ -27,4 +30,8 @@ func InitializeServer(conf *config.Config) (*LivekitServer, error) {
 	}
 	return livekitServer, nil
 
+}
+
+func createStore() ObjectStore {
+	return NewLocalStore()
 }

@@ -11,22 +11,62 @@ import (
 
 type MyRoomAllocator struct {
 	config    *config.Config
-	roomStore map[string]*livekit.Room
+	roomStore ObjectStore
 }
 
-func NewRoomAllocator(conf *config.Config) (RoomAllocator, error) {
+func NewRoomAllocator(conf *config.Config, rs ObjectStore) (RoomAllocator, error) {
 	return &MyRoomAllocator{
 		config:    conf,
-		roomStore: make(map[string]*livekit.Room),
+		roomStore: rs,
 	}, nil
 }
 
 func (r *MyRoomAllocator) CreateRoom(ctx context.Context, req *livekit.CreateRoomRequest) (*livekit.Room, error) {
-	return &livekit.Room{
-		Sid:          utils.NewGuid(utils.RoomPrefix),
-		Name:         req.Name,
-		CreationTime: time.Now().Unix(),
-		TurnPassword: utils.RandomSecret(),
-	}, nil
+	token, err := r.roomStore.LockRoom(ctx, livekit.RoomName(req.Name), 5*time.Second)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = r.roomStore.UnlockRoom(ctx, livekit.RoomName(req.Name), token)
+	}()
 
+	// find existing room and update it
+	rm, err := r.roomStore.LoadRoom(ctx, livekit.RoomName(req.Name))
+	if err == ErrRoomNotFound {
+		rm = &livekit.Room{
+			Sid:          utils.NewGuid(utils.RoomPrefix),
+			Name:         req.Name,
+			CreationTime: time.Now().Unix(),
+			TurnPassword: utils.RandomSecret(),
+		}
+		applyDefaultRoomConfig(rm, &r.config.Room)
+	} else if err != nil {
+		return nil, err
+	}
+
+	if req.EmptyTimeout > 0 {
+		rm.EmptyTimeout = req.EmptyTimeout
+	}
+	if req.MaxParticipants > 0 {
+		rm.MaxParticipants = req.MaxParticipants
+	}
+	if req.Metadata != "" {
+		rm.Metadata = req.Metadata
+	}
+	if err := r.roomStore.StoreRoom(ctx, rm); err != nil {
+		return nil, err
+	}
+
+	return rm, nil
+}
+
+func applyDefaultRoomConfig(room *livekit.Room, conf *config.RoomConfig) {
+	room.EmptyTimeout = conf.EmptyTimeout
+	room.MaxParticipants = conf.MaxParticipants
+	for _, codec := range conf.EnabledCodecs {
+		room.EnabledCodecs = append(room.EnabledCodecs, &livekit.Codec{
+			Mime:     codec.Mime,
+			FmtpLine: codec.FmtpLine,
+		})
+	}
 }

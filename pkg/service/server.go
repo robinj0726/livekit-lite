@@ -10,6 +10,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
+	"github.com/urfave/negroni"
 )
 
 type LivekitServer struct {
@@ -35,12 +36,18 @@ func NewLivekitServer(conf *config.Config,
 		closedChan:  make(chan struct{}),
 	}
 
+	middlewares := []negroni.Handler{
+		// always first
+		negroni.NewRecovery(),
+	}
+
 	roomServer := livekit.NewRoomServiceServer(roomService)
 
 	mux := http.NewServeMux()
 	mux.Handle(roomServer.PathPrefix(), roomServer)
-
-	s.httpServer = &http.Server{}
+	s.httpServer = &http.Server{
+		Handler: configureMiddlewares(mux, middlewares...),
+	}
 
 	return
 }
@@ -115,4 +122,13 @@ func (s *LivekitServer) Stop(force bool) {
 
 	// wait for fully closed
 	<-s.closedChan
+}
+
+func configureMiddlewares(handler http.Handler, middlewares ...negroni.Handler) *negroni.Negroni {
+	n := negroni.New()
+	for _, m := range middlewares {
+		n.Use(m)
+	}
+	n.UseHandler(handler)
+	return n
 }

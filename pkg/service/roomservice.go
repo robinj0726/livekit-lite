@@ -4,17 +4,27 @@ import (
 	"context"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/pkg/errors"
 )
 
-type RoomService struct{}
+type RoomService struct {
+	roomAllocator RoomAllocator
+}
 
-func NewRoomService() (svc *RoomService, err error) {
-	svc = &RoomService{}
+func NewRoomService(ra RoomAllocator) (svc *RoomService, err error) {
+	svc = &RoomService{
+		roomAllocator: ra,
+	}
 
 	return
 }
 
 func (s *RoomService) CreateRoom(ctx context.Context, req *livekit.CreateRoomRequest) (rm *livekit.Room, err error) {
+	rm, err = s.roomAllocator.CreateRoom(ctx, req)
+	if err != nil {
+		err = errors.Wrap(err, "could not create room")
+	}
+
 	return
 }
 

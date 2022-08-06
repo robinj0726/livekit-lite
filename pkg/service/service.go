@@ -4,7 +4,12 @@ import "livekit-lite/pkg/config"
 
 func InitializeServer(conf *config.Config) (*LivekitServer, error) {
 
-	roomService, err := NewRoomService()
+	roomAllocator, err := NewRoomAllocator(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	roomService, err := NewRoomService(roomAllocator)
 	if err != nil {
 		return nil, err
 	}

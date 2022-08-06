@@ -10,6 +10,7 @@ require (
 	github.com/pion/logging v0.2.2
 	github.com/pion/webrtc/v3 v3.1.43
 	github.com/pkg/errors v0.9.1
+	github.com/thoas/go-funk v0.9.2
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1

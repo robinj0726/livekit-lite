@@ -52,10 +52,24 @@ func (s *RoomService) DeleteRoom(ctx context.Context, req *livekit.DeleteRoomReq
 }
 
 func (s *RoomService) ListParticipants(ctx context.Context, req *livekit.ListParticipantsRequest) (res *livekit.ListParticipantsResponse, err error) {
+	participants, err := s.roomStore.ListParticipants(ctx, livekit.RoomName(req.Room))
+	if err != nil {
+		return
+	}
+
+	res = &livekit.ListParticipantsResponse{
+		Participants: participants,
+	}
 	return
 }
 
 func (s *RoomService) GetParticipant(ctx context.Context, req *livekit.RoomParticipantIdentity) (res *livekit.ParticipantInfo, err error) {
+	participant, err := s.roomStore.LoadParticipant(ctx, livekit.RoomName(req.Room), livekit.ParticipantIdentity(req.Identity))
+	if err != nil {
+		return
+	}
+
+	res = participant
 	return
 }
 

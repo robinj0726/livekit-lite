@@ -12,6 +12,7 @@ type Config struct {
 	BindAddresses []string      `yaml:"bind_addresses"`
 	RTC           RTCConfig     `yaml:"rtc,omitempty"`
 	Room          RoomConfig    `yaml:"room,omitempty"`
+	Region        string        `yaml:"region,omitempty"`
 	Logging       LoggingConfig `yaml:"logging,omitempty"`
 
 	Development bool `yaml:"development,omitempty"`
@@ -22,6 +23,7 @@ type RTCConfig struct {
 	TCPPort           uint32 `yaml:"tcp_port,omitempty"`
 	ICEPortRangeStart uint32 `yaml:"port_range_start,omitempty"`
 	ICEPortRangeEnd   uint32 `yaml:"port_range_end,omitempty"`
+	NodeIP            string `yaml:"node_ip,omitempty"`
 
 	// for testing, disable UDP
 	ForceTCP bool `yaml:"force_tcp,omitempty"`

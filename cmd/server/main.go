@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"livekit-lite/pkg/config"
+	"livekit-lite/pkg/routing"
 	"livekit-lite/pkg/service"
 
 	serverlogger "livekit-lite/pkg/logger"
@@ -51,7 +52,12 @@ func startServer() error {
 		return err
 	}
 
-	server, err := service.InitializeServer(conf)
+	currentNode, err := routing.NewLocalNode(conf)
+	if err != nil {
+		return err
+	}
+
+	server, err := service.InitializeServer(conf, currentNode)
 	if err != nil {
 		return err
 	}

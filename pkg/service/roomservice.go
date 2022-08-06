@@ -2,18 +2,21 @@ package service
 
 import (
 	"context"
+	"livekit-lite/pkg/routing"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/pkg/errors"
 )
 
 type RoomService struct {
+	router        routing.MessageRouter
 	roomAllocator RoomAllocator
 	roomStore     ServiceStore
 }
 
-func NewRoomService(ra RoomAllocator, rs ServiceStore) (svc *RoomService, err error) {
+func NewRoomService(ra RoomAllocator, rs ServiceStore, router routing.MessageRouter) (svc *RoomService, err error) {
 	svc = &RoomService{
+		router:        router,
 		roomAllocator: ra,
 		roomStore:     rs,
 	}

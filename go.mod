@@ -12,7 +12,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/thoas/go-funk v0.9.2
 	github.com/urfave/negroni v1.0.0
+	go.uber.org/atomic v1.7.0
 	go.uber.org/zap v1.21.0
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -48,7 +50,6 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/twitchtv/twirp v8.1.0+incompatible // indirect
-	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20220516162934-403b01795ae8 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
@@ -56,5 +57,5 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.42.0 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 )

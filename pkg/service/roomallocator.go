@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"livekit-lite/pkg/config"
+	"livekit-lite/pkg/routing"
 	"time"
 
 	"github.com/livekit/protocol/livekit"
@@ -11,12 +12,14 @@ import (
 
 type MyRoomAllocator struct {
 	config    *config.Config
+	router    routing.Router
 	roomStore ObjectStore
 }
 
-func NewRoomAllocator(conf *config.Config, rs ObjectStore) (RoomAllocator, error) {
+func NewRoomAllocator(conf *config.Config, router routing.Router, rs ObjectStore) (RoomAllocator, error) {
 	return &MyRoomAllocator{
 		config:    conf,
+		router:    router,
 		roomStore: rs,
 	}, nil
 }
@@ -54,6 +57,12 @@ func (r *MyRoomAllocator) CreateRoom(ctx context.Context, req *livekit.CreateRoo
 		rm.Metadata = req.Metadata
 	}
 	if err := r.roomStore.StoreRoom(ctx, rm); err != nil {
+		return nil, err
+	}
+
+	// check if room already assigned
+	_, err = r.router.GetNodeForRoom(ctx, livekit.RoomName(rm.Name))
+	if err != routing.ErrNotFound && err != nil {
 		return nil, err
 	}
 
